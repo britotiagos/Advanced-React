@@ -6,10 +6,10 @@ type SuccessMessage {
 
 type Mutation {
   createItem(
-    title: String
-    description: String
-    price: Int
-    image: String
+    title: String,
+    description: String,
+    price: Int,
+    image: String,
     largeImage: String
   ): Item!
   updateItem(id: ID!, title: String, description: String, price: Int): Item!
@@ -19,20 +19,21 @@ type Mutation {
   signout: SuccessMessage
   requestReset(email: String!): SuccessMessage
   resetPassword(
-    resetToken: String!
-    password: String!
+    resetToken: String!,
+    password: String!,
     confirmPassword: String!
   ): User!
   updatePermissions(permissions: [Permission], userId: ID!): User
   addToCart(id: ID!): CartItem
   removeFromCart(id: ID!): CartItem
+  createOrder(token: String!): Order!
 }
 
 type Query {
   items(
-    where: ItemWhereInput
-    orderBy: ItemOrderByInput
-    skip: Int
+    where: ItemWhereInput,
+    orderBy: ItemOrderByInput,
+    skip: Int,
     first: Int
   ): [Item]!
   item(where: ItemWhereUniqueInput!): Item
@@ -41,7 +42,7 @@ type Query {
   users: [User]!
 }
 
-type User {
+type User{
   id: ID!
   name: String!
   email: String!
