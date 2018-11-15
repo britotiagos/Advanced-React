@@ -1,13 +1,13 @@
 import React from 'react';
 import StripeCheckout from 'react-stripe-checkout';
-import { Mutation } from "react-apollo";
+import { Mutation } from 'react-apollo';
 import Router from 'next/router';
 import NProgress from 'nprogress';
 import PropTypes from 'prop-types';
 import gql from 'graphql-tag';
 import calcTotalPrice from '../lib/calcTotalPrice';
 import Error from './ErrorMessage';
-import User, { CURRENT_USER_QUERY } from "./User";
+import User, { CURRENT_USER_QUERY } from './User';
 
 const CREATE_ORDER_MUTATION = gql`
   mutation createOrder($token: String!) {
@@ -31,7 +31,7 @@ class TakeMyMoney extends React.Component {
   onToken = async (res, createOrder) => {
     console.log('On Token Called!');
     console.log(res.id);
-    // manually call the mutation once we have the strip token
+    // manually call the mutation once we have the stripe token
     const order = await createOrder({
       variables: {
         token: res.id,
@@ -55,7 +55,7 @@ class TakeMyMoney extends React.Component {
                 name="Sick Fits"
                 description={`Order of ${totalItems(me.cart)} items!`}
                 image={me.cart.length && me.cart[0].item && me.cart[0].item.image}
-                stripeKey="pk_test_RFvPMk1Irq0EK39duZEK3BBT"
+                stripeKey="pk_test_Vtknn6vSdcZWSG2JWvEiWSqC"
                 currency="USD"
                 email={me.email}
                 token={res => this.onToken(res, createOrder)}
@@ -66,8 +66,7 @@ class TakeMyMoney extends React.Component {
           </Mutation>
         )}
       </User>
-    )
-
+    );
   }
 }
 

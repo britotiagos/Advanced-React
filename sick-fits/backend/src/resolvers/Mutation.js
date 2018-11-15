@@ -24,7 +24,7 @@ const Mutations = {
           ...args,
         },
       },
-      info,
+      info
     );
 
     console.log(item);
@@ -44,16 +44,18 @@ const Mutations = {
           id: args.id,
         },
       },
-      info,
+      info
     );
   },
   async deleteItem(parent, args, ctx, info) {
     const where = { id: args.id };
     // 1. find the item
-    const item = await ctx.db.query.item({ where }, '{ id title user { id }}');
+    const item = await ctx.db.query.item({ where }, `{ id title user { id }}`);
     // 2. Check if they own that item, or have the permissions
     const ownsItem = item.user.id === ctx.request.userId;
-    const hasPermissions = ctx.request.user.permissions.some(permission => ['ADMIN', 'ITEMDELETE'].includes(permission));
+    const hasPermissions = ctx.request.user.permissions.some(permission =>
+      ['ADMIN', 'ITEMDELETE'].includes(permission)
+    );
 
     if (!ownsItem && !hasPermissions) {
       throw new Error("You don't have permission to do that!");
@@ -76,7 +78,7 @@ const Mutations = {
           permissions: { set: ['USER'] },
         },
       },
-      info,
+      info
     );
     // create the JWT token for them
     const token = jwt.sign({ userId: user.id }, process.env.APP_SECRET);
@@ -134,9 +136,8 @@ const Mutations = {
       subject: 'Your Password Reset Token',
       html: makeANiceEmail(`Your Password Reset Token is here!
       \n\n
-      <a href="${
-        process.env.FRONTEND_URL
-        }/reset?resetToken=${resetToken}">Click Here to Reset</a>`),
+      <a href="${process.env
+        .FRONTEND_URL}/reset?resetToken=${resetToken}">Click Here to Reset</a>`),
     });
 
     // 4. Return the message
@@ -191,7 +192,7 @@ const Mutations = {
           id: ctx.request.userId,
         },
       },
-      info,
+      info
     );
     // 3. Check if they have permissions to do this
     hasPermission(currentUser, ['ADMIN', 'PERMISSIONUPDATE']);
@@ -207,7 +208,7 @@ const Mutations = {
           id: args.userId,
         },
       },
-      info,
+      info
     );
   },
   async addToCart(parent, args, ctx, info) {
@@ -231,7 +232,7 @@ const Mutations = {
           where: { id: existingCartItem.id },
           data: { quantity: existingCartItem.quantity + 1 },
         },
-        info,
+        info
       );
     }
     // 4. If its not, create a fresh CartItem for that user!
@@ -246,7 +247,7 @@ const Mutations = {
           },
         },
       },
-      info,
+      info
     );
   },
   async removeFromCart(parent, args, ctx, info) {
@@ -257,20 +258,20 @@ const Mutations = {
           id: args.id,
         },
       },
-      '{ id, user { id }}',
+      `{ id, user { id }}`
     );
     // 1.5 Make sure we found an item
-    if (!cartItem) throw new Error('No CartItem found');
+    if (!cartItem) throw new Error('No CartItem Found!');
     // 2. Make sure they own that cart item
     if (cartItem.user.id !== ctx.request.userId) {
-      throw new Error('Cheating huhhhh!!!');
+      throw new Error('Cheatin huhhhh');
     }
     // 3. Delete that cart item
     return ctx.db.mutation.deleteCartItem(
       {
         where: { id: args.id },
       },
-      info,
+      info
     );
   },
   async createOrder(parent, args, ctx, info) {
@@ -280,18 +281,19 @@ const Mutations = {
     const user = await ctx.db.query.user(
       { where: { id: userId } },
       `{
+      id
+      name
+      email
+      cart {
         id
-        name
-        email
-        cart {
-          id
-          quantity
-          item { title price id description image largeImage}
-        }}`
+        quantity
+        item { title price id description image largeImage }
+      }}`
     );
     // 2. recalculate the total for the price
     const amount = user.cart.reduce(
-      (tally, cartItem) => tally + cartItem.item.price * cartItem.quantity, 0
+      (tally, cartItem) => tally + cartItem.item.price * cartItem.quantity,
+      0
     );
     console.log(`Going to charge for a total of ${amount}`);
     // 3. Create the stripe charge (turn token into $$$)
@@ -299,7 +301,7 @@ const Mutations = {
       amount,
       currency: 'USD',
       source: args.token,
-    })
+    });
     // 4. Convert the CartItems to OrderItems
     const orderItems = user.cart.map(cartItem => {
       const orderItem = {
@@ -309,8 +311,9 @@ const Mutations = {
       };
       delete orderItem.id;
       return orderItem;
-    })
-    // 5. Create the order
+    });
+
+    // 5. create the Order
     const order = await ctx.db.mutation.createOrder({
       data: {
         total: charge.amount,
@@ -326,9 +329,9 @@ const Mutations = {
         id_in: cartItemIds,
       },
     });
-    // 7. Return the ORder to the client
+    // 7. Return the Order to the client
     return order;
-  }
+  },
 };
 
 module.exports = Mutations;
