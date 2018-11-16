@@ -1,11 +1,10 @@
-import React, { Component } from "react";
-import { Mutation } from "react-apollo";
-import gql from "graphql-tag";
-import Form from "./styles/Form";
-import formatMoney from "../lib/formatMoney";
-import Router from "next/router";
-import Error from "./ErrorMessage";
-import { format } from "date-fns/fp";
+import React, { Component } from 'react';
+import { Mutation } from 'react-apollo';
+import gql from 'graphql-tag';
+import Router from 'next/router';
+import Form from './styles/Form';
+import formatMoney from '../lib/formatMoney';
+import Error from './ErrorMessage';
 
 const CREATE_ITEM_MUTATION = gql`
   mutation CREATE_ITEM_MUTATION(
@@ -29,36 +28,32 @@ const CREATE_ITEM_MUTATION = gql`
 
 class CreateItem extends Component {
   state = {
-    title: "Cool shoes",
-    description: "dsfsdfsd",
-    image: "dog.jpg",
-    largeImage: "doggg.jpg",
-    price: 1000
+    title: '',
+    description: '',
+    image: '',
+    largeImage: '',
+    price: 0,
   };
   handleChange = e => {
     const { name, type, value } = e.target;
-    const val = type === "number" ? parseFloat(value) : value;
+    const val = type === 'number' ? parseFloat(value) : value;
     this.setState({ [name]: val });
   };
+
   uploadFile = async e => {
-    console.log("uploafing File");
     const files = e.target.files;
     const data = new FormData();
-    data.append("file", files[0]);
-    data.append("upload_preset", "sickfits");
+    data.append('file', files[0]);
+    data.append('upload_preset', 'sickfits');
 
-    const res = await fetch(
-      "https://api.cloudinary.com/v1_1/tiagosbrito/image/upload",
-      {
-        method: "POST",
-        body: data
-      }
-    );
+    const res = await fetch('https://api.cloudinary.com/v1_1/wesbostutorial/image/upload', {
+      method: 'POST',
+      body: data,
+    });
     const file = await res.json();
-    console.log(file);
     this.setState({
       image: file.secure_url,
-      largeImage: file.eager[0].secure_url
+      largeImage: file.eager[0].secure_url,
     });
   };
   render() {
@@ -66,16 +61,17 @@ class CreateItem extends Component {
       <Mutation mutation={CREATE_ITEM_MUTATION} variables={this.state}>
         {(createItem, { loading, error }) => (
           <Form
+            data-test="form"
             onSubmit={async e => {
               // Stop the form from submitting
               e.preventDefault();
-              // Call the mutation
+              // call the mutation
               const res = await createItem();
-              // Change them to the single item page
+              // change them to the single item page
               console.log(res);
               Router.push({
-                pathname: "/item",
-                query: { id: res.data.createItem.id }
+                pathname: '/item',
+                query: { id: res.data.createItem.id },
               });
             }}
           >
@@ -92,16 +88,17 @@ class CreateItem extends Component {
                   onChange={this.uploadFile}
                 />
                 {this.state.image && (
-                  <img src={this.state.image} alt="Upload Preview" />
+                  <img width="200" src={this.state.image} alt="Upload Preview" />
                 )}
               </label>
+
               <label htmlFor="title">
                 Title
                 <input
                   type="text"
                   id="title"
                   name="title"
-                  placeholder="title"
+                  placeholder="Title"
                   required
                   value={this.state.title}
                   onChange={this.handleChange}
@@ -122,11 +119,11 @@ class CreateItem extends Component {
               </label>
 
               <label htmlFor="description">
-                description
+                Description
                 <textarea
                   id="description"
                   name="description"
-                  placeholder="Enter a Description"
+                  placeholder="Enter A Description"
                   required
                   value={this.state.description}
                   onChange={this.handleChange}
