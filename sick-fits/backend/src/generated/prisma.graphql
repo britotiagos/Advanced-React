@@ -1,5 +1,5 @@
-# source: https://us1.prisma.sh/wesbos/siccccccccck-fits/dev
-# timestamp: Tue Sep 11 2018 16:26:22 GMT-0400 (EDT)
+# source: https://sick-fits-prod-b4a3ca57e9.herokuapp.com/sick-fits-prod/prod
+# timestamp: Mon Nov 19 2018 11:23:17 GMT+1100 (AEDT)
 
 type AggregateCartItem {
   count: Int!
@@ -29,8 +29,8 @@ type BatchPayload {
 type CartItem implements Node {
   id: ID!
   quantity: Int!
-  item(where: ItemWhereInput): Item
-  user(where: UserWhereInput): User!
+  item: Item
+  user: User!
 }
 
 """A connection to a list of items."""
@@ -127,6 +127,10 @@ input CartItemUpdateInput {
   quantity: Int
   item: ItemUpdateOneInput
   user: UserUpdateOneRequiredWithoutCartInput
+}
+
+input CartItemUpdateManyMutationInput {
+  quantity: Int
 }
 
 input CartItemUpdateManyWithoutUserInput {
@@ -242,7 +246,7 @@ type Item implements Node {
   image: String
   largeImage: String
   price: Int!
-  user(where: UserWhereInput): User!
+  user: User!
 }
 
 """A connection to a list of items."""
@@ -361,6 +365,14 @@ input ItemUpdateInput {
   largeImage: String
   price: Int
   user: UserUpdateOneRequiredInput
+}
+
+input ItemUpdateManyMutationInput {
+  title: String
+  description: String
+  image: String
+  largeImage: String
+  price: Int
 }
 
 input ItemUpdateOneInput {
@@ -642,11 +654,11 @@ type Mutation {
   upsertItem(where: ItemWhereUniqueInput!, create: ItemCreateInput!, update: ItemUpdateInput!): Item!
   upsertOrderItem(where: OrderItemWhereUniqueInput!, create: OrderItemCreateInput!, update: OrderItemUpdateInput!): OrderItem!
   upsertUser(where: UserWhereUniqueInput!, create: UserCreateInput!, update: UserUpdateInput!): User!
-  updateManyCartItems(data: CartItemUpdateInput!, where: CartItemWhereInput): BatchPayload!
-  updateManyOrders(data: OrderUpdateInput!, where: OrderWhereInput): BatchPayload!
-  updateManyItems(data: ItemUpdateInput!, where: ItemWhereInput): BatchPayload!
-  updateManyOrderItems(data: OrderItemUpdateInput!, where: OrderItemWhereInput): BatchPayload!
-  updateManyUsers(data: UserUpdateInput!, where: UserWhereInput): BatchPayload!
+  updateManyCartItems(data: CartItemUpdateManyMutationInput!, where: CartItemWhereInput): BatchPayload!
+  updateManyOrders(data: OrderUpdateManyMutationInput!, where: OrderWhereInput): BatchPayload!
+  updateManyItems(data: ItemUpdateManyMutationInput!, where: ItemWhereInput): BatchPayload!
+  updateManyOrderItems(data: OrderItemUpdateManyMutationInput!, where: OrderItemWhereInput): BatchPayload!
+  updateManyUsers(data: UserUpdateManyMutationInput!, where: UserWhereInput): BatchPayload!
   deleteManyCartItems(where: CartItemWhereInput): BatchPayload!
   deleteManyOrders(where: OrderWhereInput): BatchPayload!
   deleteManyItems(where: ItemWhereInput): BatchPayload!
@@ -670,7 +682,7 @@ type Order implements Node {
   id: ID!
   items(where: OrderItemWhereInput, orderBy: OrderItemOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [OrderItem!]
   total: Int!
-  user(where: UserWhereInput): User!
+  user: User!
   charge: String!
   createdAt: DateTime!
   updatedAt: DateTime!
@@ -710,7 +722,7 @@ type OrderItem implements Node {
   largeImage: String!
   price: Int!
   quantity: Int!
-  user(where: UserWhereInput): User
+  user: User
 }
 
 """A connection to a list of items."""
@@ -844,6 +856,15 @@ input OrderItemUpdateManyInput {
   delete: [OrderItemWhereUniqueInput!]
   update: [OrderItemUpdateWithWhereUniqueNestedInput!]
   upsert: [OrderItemUpsertWithWhereUniqueNestedInput!]
+}
+
+input OrderItemUpdateManyMutationInput {
+  title: String
+  description: String
+  image: String
+  largeImage: String
+  price: Int
+  quantity: Int
 }
 
 input OrderItemUpdateWithWhereUniqueNestedInput {
@@ -1182,6 +1203,11 @@ input OrderUpdateInput {
   charge: String
   items: OrderItemUpdateManyInput
   user: UserUpdateOneRequiredInput
+}
+
+input OrderUpdateManyMutationInput {
+  total: Int
+  charge: String
 }
 
 input OrderWhereInput {
@@ -1554,6 +1580,15 @@ input UserUpdateInput {
   resetTokenExpiry: String
   permissions: UserUpdatepermissionsInput
   cart: CartItemUpdateManyWithoutUserInput
+}
+
+input UserUpdateManyMutationInput {
+  name: String
+  email: String
+  password: String
+  resetToken: String
+  resetTokenExpiry: String
+  permissions: UserUpdatepermissionsInput
 }
 
 input UserUpdateOneInput {
